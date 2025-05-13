@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Generator</title>
+    <style>
+        /* Basic styling */
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .invoice-form {
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .form-group input[type="number"] {
+            width: 48%;
+            display: inline-block;
+        }
+
+        .form-group input[type="date"] {
+            width: 48%;
+            display: inline-block;
+        }
+
+        .form-group button {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .form-group button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Modal Styling */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            width: 80%;
+            max-width: 900px;
+            margin: 0 auto;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            overflow: auto;
+        }
+
+        .modal-content h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-content p {
+            margin: 5px 0;
+        }
+
+        .close-btn {
+            background-color: #f44336;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            float: right;
+        }
+
+        .close-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        .invoice-preview {
+            width: 210mm;
+            height: 297mm;
+            margin: 0 auto;
+            padding: 20mm;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            background-color: white;
+        }
+
+        .invoice-preview .header,
+        .invoice-preview .footer {
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .invoice-preview .section {
+            margin: 15px 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Invoice Generator</h1>
+
+    <div class="invoice-form">
+        <div class="form-group">
+            <label for="invoice-number">Invoice #:</label>
+            <input type="text" id="invoice-number" placeholder="Enter Invoice Number">
+        </div>
+        <div class="form-group">
+            <label for="invoice-date">Date:</label>
+            <input type="date" id="invoice-date">
+        </div>
+        <div class="form-group">
+            <label for="bill-from">Bill From:</label>
+            <input type="text" id="bill-from" placeholder="Enter Billing From">
+        </div>
+        <div class="form-group">
+            <label for="bill-to">Bill To:</label>
+            <input type="text" id="bill-to" placeholder="Enter Billing To">
+        </div>
+        <div class="form-group">
+            <label for="item-description">Item Description:</label>
+            <input type="text" id="item-description" placeholder="Item Description">
+        </div>
+        <div class="form-group">
+            <label for="item-quantity">Quantity:</label>
+            <input type="number" id="item-quantity" placeholder="Quantity">
+            <label for="item-rate">Rate:</label>
+            <input type="number" id="item-rate" placeholder="Rate">
+        </div>
+        <div class="form-group">
+            <label for="tax">Tax:</label>
+            <input type="number" id="tax" placeholder="Tax">
+        </div>
+        <div class="form-group">
+            <label for="discount">Discount:</label>
+            <input type="number" id="discount" placeholder="Discount">
+        </div>
+        <div class="form-group">
+            <label for="notes">Notes:</label>
+            <textarea id="notes" rows="4" placeholder="Enter additional notes..."></textarea>
+        </div>
+        <div class="form-group">
+            <button onclick="previewInvoice()">Preview Invoice</button>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="invoiceModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">Close</button>
+            <div id="invoice-preview" class="invoice-preview">
+                <div class="header">
+                    <h2>Invoice</h2>
+                    <p>Invoice # <span id="preview-invoice-number"></span></p>
+                    <p>Date: <span id="preview-date"></span></p>
+                </div>
+                <div class="section">
+                    <p><strong>Bill From:</strong> <span id="preview-bill-from"></span></p>
+                    <p><strong>Bill To:</strong> <span id="preview-bill-to"></span></p>
+                </div>
+                <div class="section">
+                    <p><strong>Item:</strong> <span id="preview-item-description"></span></p>
+                    <p><strong>Quantity:</strong> <span id="preview-quantity"></span></p>
+                    <p><strong>Rate:</strong> $<span id="preview-rate"></span></p>
+                    <p><strong>Total:</strong> $<span id="preview-total"></span></p>
+                </div>
+                <div class="section">
+                    <p><strong>Tax:</strong> $<span id="preview-tax"></span></p>
+                    <p><strong>Discount:</strong> $<span id="preview-discount"></span></p>
+                </div>
+                <div class="section">
+                    <p><strong>Notes:</strong> <span id="preview-notes"></span></p>
+                </div>
+                <div class="footer">
+                    <p>Thank you for your business!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function previewInvoice() {
+            // Get form values
+            const invoiceNumber = document.getElementById('invoice-number').value;
+            const invoiceDate = document.getElementById('invoice-date').value;
+            const billFrom = document.getElementById('bill-from').value;
+            const billTo = document.getElementById('bill-to').value;
+            const itemDescription = document.getElementById('item-description').value;
+            const quantity = parseFloat(document.getElementById('item-quantity').value) || 0;
+            const rate = parseFloat(document.getElementById('item-rate').value) || 0;
+            const tax = parseFloat(document.getElementById('tax').value) || 0;
+            const discount = parseFloat(document.getElementById('discount').value) || 0;
+            const notes = document.getElementById('notes').value;
+
+            // Calculate total
+            const total = quantity * rate;
+            const totalWithTaxAndDiscount = total + tax - discount;
+
+            // Update preview content
+            document.getElementById('preview-invoice-number').innerText = invoiceNumber;
+            document.getElementById('preview-date').innerText = invoiceDate;
+            document.getElementById('preview-bill-from').innerText = billFrom;
+            document.getElementById('preview-bill-to').innerText = billTo;
+            document.getElementById('preview-item-description').innerText = itemDescription;
+            document.getElementById('preview-quantity').innerText = quantity;
+            document.getElementById('preview-rate').innerText = rate;
+            document.getElementById('preview-total').innerText = total.toFixed(2);
+            document.getElementById('preview-tax').innerText = tax.toFixed(2);
+            document.getElementById('preview-discount').innerText = discount.toFixed(2);
+            document.getElementById('preview-notes').innerText = notes;
+
+            // Show the modal
+            document.getElementById('invoiceModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('invoiceModal').style.display = 'none';
+        }
+    </script>
+</body>
+
+</html>

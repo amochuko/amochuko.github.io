@@ -1,0 +1,23 @@
+{
+  "name": "statis-invoice-generator",
+  "version": "1.0.0",
+  "description": "A simple invoice generator",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amochuko/statis-invoice-generator-.git"
+  },
+  "keywords": [
+    "invoice",
+    "generator"
+  ],
+  "author": "ochuko awhe",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/amochuko/statis-invoice-generator-/issues"
+  },
+  "homepage": "https://github.com/amochuko/statis-invoice-generator-#readme"
+}
